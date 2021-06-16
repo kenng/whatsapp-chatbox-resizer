@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Whatsapp TextArea Resize
 // @namespace    https://github.com/kenng/whatsapp-chatbox-resizer
-// @version      0.2
+// @version      0.3
 // @description  resizable chatbox text area
 // @author       Ken Ng
 // @match        https://web.whatsapp.com/
@@ -14,52 +14,51 @@
     const mainPaneClassName = '_3QfZd two';
     const mutationTargetClass = '_1Flk2 _1sFTb';
     const mutataionTargetPrevSibling = '_3AUV4';
+    const resizerSize = 10;
     let original_mouse_y = 0;
 
     function prependResizer() {
-        var resizer = document.createElement('div');
+        const resizer = document.createElement('div');
         resizer.className = 'iw-resizer';
-        resizer.style.height = '10px';
+        resizer.style.height = `${resizerSize}px`;
         resizer.style.backgroundColor = '#ccc';
         resizer.style.cursor = 'move';
-        let footer = document.getElementsByTagName('footer')[0];
+        const footer = document.getElementsByTagName('footer')[0];
         footer.prepend(resizer);
     }
 
     function resize(e) {
-        const element = document.querySelector(
+        document.body.style.cursor = 'move';
+        const chatboxElem = document.querySelector(
             'footer > div > div:nth-child(2)',
         );
-        element.style.maxHeight = '100%';
-        const textelem = document.querySelector(
-            'footer > div > div:nth-child(2) > div > div:nth-child(2)',
-        );
-        if (textelem) textelem.style.maxHeight = '100%';
+        chatboxElem.style.maxHeight = '100%';
 
-        const minimum_size = 20;
-        let original_height = parseFloat(
-            getComputedStyle(element, null)
+        const min_height = 42;
+        const original_height = parseFloat(
+            getComputedStyle(chatboxElem, null)
                 .getPropertyValue('height')
                 .replace('px', ''),
         );
-        let original_y = element.getBoundingClientRect().top;
+        const original_y = chatboxElem.getBoundingClientRect().top;
+        const new_y = original_y - e.pageY - resizerSize;
+        const height = original_height + new_y;
 
-        const height = original_height - (e.pageY - original_mouse_y);
-        original_mouse_y = e.pageY;
-
-        if (height > minimum_size) {
-            element.style.height = height + 'px';
-            element.style.top =
-                original_y + (e.pageY - original_mouse_y) + 'px';
+        if (height > min_height) {
+            chatboxElem.style.height = height + 'px';
+            chatboxElem.style.top = new_y + 'px';
         }
+        // console.log(height, original_height, new_y, original_y, e.pageY);
     }
 
     function stopResize() {
+        document.body.style.cursor = 'initial';
         window.removeEventListener('mousemove', resize);
     }
 
     function evMouseDown(ev) {
         ev.preventDefault();
+
         window.addEventListener('mousemove', resize);
         window.addEventListener('mouseup', stopResize);
     }
