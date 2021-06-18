@@ -25,23 +25,24 @@
 
     function resize(e) {
         document.body.style.cursor = 'move';
-        const chatboxElem = document.querySelector('footer [contenteditable]')
-            .parentElement.parentElement;
-        chatboxElem.style.maxHeight = '100%';
+        const chatboxElem = document.querySelector('footer [contenteditable]');
+        const chatboxElemParen = chatboxElem.parentElement.parentElement;
+        chatboxElem.style.maxHeight = 'initial';
+        chatboxElem.parentElement.style.maxHeight = '100%';
 
         const min_height = 42;
         const original_height = parseFloat(
-            getComputedStyle(chatboxElem, null)
+            getComputedStyle(chatboxElemParen, null)
                 .getPropertyValue('height')
                 .replace('px', ''),
         );
-        const original_y = chatboxElem.getBoundingClientRect().top;
+        const original_y = chatboxElemParen.getBoundingClientRect().top;
         const new_y = original_y - e.pageY - resizerSize;
         const height = original_height + new_y;
 
         if (height > min_height) {
-            chatboxElem.style.height = height + 'px';
-            chatboxElem.style.top = new_y + 'px';
+            chatboxElemParen.style.height = height + 'px';
+            chatboxElemParen.style.top = new_y + 'px';
         }
         // console.log(height, original_height, new_y, original_y, e.pageY);
     }
@@ -71,10 +72,7 @@
     function init() {
         let mutationObserver = new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
-                if (
-                    mutation.previousSibling?.id ===
-                    'main'
-                ) {
+                if (mutation.previousSibling?.id === 'main') {
                     prependResizer();
                     makeResizableDiv();
                 }
