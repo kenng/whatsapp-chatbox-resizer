@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Whatsapp TextArea Resize
 // @namespace    https://github.com/kenng/whatsapp-chatbox-resizer
-// @version      0.4
+// @version      1.0
 // @description  resizable chatbox text area
 // @author       Ken Ng
 // @match        https://web.whatsapp.com/
