@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Whatsapp TextArea Resize
 // @namespace    https://github.com/kenng/whatsapp-chatbox-resizer
-// @version      0.3
+// @version      0.4
 // @description  resizable chatbox text area
 // @author       Ken Ng
 // @match        https://web.whatsapp.com/
@@ -11,11 +11,7 @@
 /* jshint esversion: 6 */
 (function () {
     ('use strict');
-    const mainPaneClassName = '_3QfZd two';
-    const mutationTargetClass = '_1Flk2 _1sFTb';
-    const mutataionTargetPrevSibling = '_3AUV4';
     const resizerSize = 10;
-    let original_mouse_y = 0;
 
     function prependResizer() {
         const resizer = document.createElement('div');
@@ -29,9 +25,8 @@
 
     function resize(e) {
         document.body.style.cursor = 'move';
-        const chatboxElem = document.querySelector(
-            'footer > div > div:nth-child(2)',
-        );
+        const chatboxElem = document.querySelector('footer [contenteditable]')
+            .parentElement.parentElement;
         chatboxElem.style.maxHeight = '100%';
 
         const min_height = 42;
@@ -76,21 +71,19 @@
     function init() {
         let mutationObserver = new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
-                if (mutation.target.className === mutationTargetClass) {
-                    if (
-                        mutation.previousSibling?.className ===
-                        mutataionTargetPrevSibling
-                    ) {
-                        prependResizer();
-                        makeResizableDiv();
-                    }
+                if (
+                    mutation.previousSibling?.id ===
+                    'main'
+                ) {
+                    prependResizer();
+                    makeResizableDiv();
                 }
-                // console.log(mutation.target, mutation);
+                // console.log(mutation);
             });
         });
 
         mutationObserver.observe(
-            document.getElementsByClassName(mainPaneClassName)[0],
+            document.getElementById('app').querySelector('[tabindex].two'),
             {
                 childList: true,
                 subtree: true,
